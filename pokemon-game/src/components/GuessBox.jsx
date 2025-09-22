@@ -8,6 +8,7 @@ export default function GuessBox({ names, onGuess, disabled }) {
   const [q, setQ] = useState('');
   const [open, setOpen] = useState(false);
   const boxRef = useRef(null);
+  const inputRef = useRef(null);
 
   const suggestions = useMemo(() => {
     const nQ = norm(q);
@@ -30,20 +31,20 @@ export default function GuessBox({ names, onGuess, disabled }) {
     const guess = norm(value ?? q);
     if (!guess || disabled) return;
     onGuess(guess);
-    // non svuoto per poter ritentare; se vuoi svuotare: setQ('');
     setOpen(false);
   }
 
   return (
-    <div ref={boxRef} style={{position:'relative'}}>
+    <div ref={boxRef} style={{ position:'relative' }}>
       <form onSubmit={e => { e.preventDefault(); submitGuess(); }}>
         <input
+          ref={inputRef}
           disabled={disabled}
           value={q}
           onChange={e => { setQ(e.target.value); setOpen(true); }}
           onFocus={() => setOpen(true)}
           placeholder="Scrivi il nome del Pokémon…"
-          style={{width:'100%', padding:'10px 12px', borderRadius:8, border:'1px solid #ddd'}}
+          style={{ width:'100%', padding:'10px 12px', borderRadius:8, border:'1px solid #ddd' }}
         />
       </form>
 
@@ -55,8 +56,13 @@ export default function GuessBox({ names, onGuess, disabled }) {
         }}>
           {suggestions.map(name => (
             <li key={name}
-              onMouseDown={e => { e.preventDefault(); submitGuess(name); }}
-              style={{padding:'8px 12px', cursor:'pointer'}}
+              onMouseDown={e => {
+                e.preventDefault();
+                setQ(name);        // riempi l'input
+                setOpen(false);    // chiudi il menu
+                setTimeout(() => inputRef.current?.focus(), 0);
+              }}
+              style={{ padding:'8px 12px', cursor:'pointer' }}
             >
               {name}
             </li>
@@ -65,9 +71,10 @@ export default function GuessBox({ names, onGuess, disabled }) {
       )}
 
       <button
+        type="button"
         onClick={() => submitGuess()}
         disabled={disabled}
-        style={{marginTop:10, padding:'8px 12px', borderRadius:8, border:'1px solid #ddd', background:'#fafafa'}}
+        style={{ marginTop:10, padding:'8px 12px', borderRadius:8, border:'1px solid #ddd', background:'#fafafa' }}
       >
         Indovina
       </button>
