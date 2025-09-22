@@ -15,6 +15,8 @@ export default function Game() {
   const [revealed, setRevealed] = useState(false);
   const [status, setStatus] = useState('idle');    // idle | correct | wrong
   const [loading, setLoading] = useState(true);
+  const [hintUsed, setHintUsed] = useState(false);
+
 
   // punteggio e errori
   const [score, setScore] = useState(0);
@@ -32,19 +34,20 @@ export default function Game() {
     })();
   }, []);
 
-  async function newRound(allNames = names) {
-    setLoading(true);
-    setRevealed(false);
-    setStatus('idle');
+async function newRound(allNames = names) {
+  setLoading(true);
+  setRevealed(false);
+  setStatus('idle');
+  setHintUsed(false);
 
-    const targetName = pickRandom(allNames);
-    const p = await fetchPokemon(targetName);
-    const best = getBestImage(p);
+  const targetName = pickRandom(allNames);
+  const p = await fetchPokemon(targetName);
+  const best = getBestImage(p);
 
-    setAnswer(p);
-    setImg(best);
-    setLoading(false);
-  }
+  setAnswer(p);
+  setImg(best);
+  setLoading(false);
+}
 
   function onGuess(guess) {
     if (!answer || gameOver) return;
@@ -91,6 +94,7 @@ export default function Game() {
     setWrongGuesses([]);
     setRevealed(false);
     setStatus('idle');
+    setHintUsed(false);
     newRound();
   }
 
@@ -108,6 +112,13 @@ export default function Game() {
       <div style={{display:'flex', gap:12, justifyContent:'center', flexWrap:'wrap', marginBottom:12}}>
         <div>🔢 Punti: <b>{score}</b></div>
         <div>❤️ Errori rimasti: <b>{errorsLeft}</b></div>
+        <button
+          onClick={() => setHintUsed(true)}
+          disabled={loading || hintUsed}
+          style={btnStyle}
+        >
+          Suggerimento
+        </button>
       </div>
 
       {gameOver ? (
@@ -121,11 +132,15 @@ export default function Game() {
         <>
           <Silhouette src={img} revealed={revealed} />
           <p style={{textAlign:'center', minHeight:24}}>{message}</p>
+          {hintUsed && answer && !gameOver && (
+            <div style={{textAlign:'center', marginTop:4, fontWeight:'bold'}}>
+              Inizia con: {answer.name.charAt(0).toUpperCase()}
+            </div>
+          )}
 
           <GuessBox names={names} onGuess={onGuess} disabled={!canGuess} />
 
           <div style={{display:'flex', gap:8, justifyContent:'center', marginTop:12}}>
-            <button onClick={onReveal} disabled={loading} style={btnStyle}>Rivela</button>
             <button onClick={onNext} disabled={loading} style={btnStyle}>Prossimo Pokémon</button>
             <button onClick={onShare} disabled={loading} style={btnStyle}>Condividi</button>
           </div>
