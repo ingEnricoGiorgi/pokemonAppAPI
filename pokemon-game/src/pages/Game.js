@@ -49,20 +49,21 @@ async function newRound(allNames = names) {
   setLoading(false);
 }
 
-  function onGuess(guess) {
-    if (!answer || gameOver) return;
-    const correct = answer.name.toLowerCase();
+function onGuess(guess) {
+  if (!answer || gameOver || status === 'correct') return; // SOLO la prima volta da i punti
+  const correct = answer.name.toLowerCase();
 
-    if (guess === correct) {
-      setStatus('correct');
-      setRevealed(true);
-      setScore(s => s + 10);
-    } else {
-      setStatus('wrong');
-      setErrorsLeft(n => n - 1);
-      setWrongGuesses(list => [...list, { guess, correctName: correct }]);
-    }
+  if (guess === correct) {
+    setStatus('correct');
+    setRevealed(true);
+    setScore(s => s + 10);
+  } else {
+    setStatus('wrong');
+    setErrorsLeft(n => n - 1);
+    setWrongGuesses(list => [...list, { guess, correctName: correct }]);
   }
+}
+
 
   async function onNext() {
     if (gameOver) return;
@@ -141,7 +142,13 @@ async function newRound(allNames = names) {
           )}
 
 
-          <GuessBox names={names} onGuess={onGuess} disabled={!canGuess} />
+        <GuessBox
+          key={answer?.name}   // ogni volta che cambia la risposta, rimonta il componente
+          names={names}
+          onGuess={onGuess}
+          disabled={!canGuess}
+        />
+
 
           <div style={{display:'flex', gap:8, justifyContent:'center', marginTop:12}}>
             <button onClick={onNext} disabled={loading} style={btnStyle}>Prossimo Pokémon</button>
