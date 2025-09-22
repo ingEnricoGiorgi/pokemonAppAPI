@@ -133,10 +133,13 @@ async function newRound(allNames = names) {
           <Silhouette src={img} revealed={revealed} />
           <p style={{textAlign:'center', minHeight:24}}>{message}</p>
           {hintUsed && answer && !gameOver && (
-            <div style={{textAlign:'center', marginTop:4, fontWeight:'bold'}}>
-              Inizia con: {answer.name.charAt(0).toUpperCase()}
+            <div style={{textAlign:'center', marginTop:4, marginBottom:12, fontWeight:'bold', lineHeight:1.6}}>
+              <div>Inizia con: {answer.name.charAt(0).toUpperCase()}</div>
+              {/* <div>Finisce con: {answer.name.charAt(answer.name.length - 1).toUpperCase()}</div> */}
+
             </div>
           )}
+
 
           <GuessBox names={names} onGuess={onGuess} disabled={!canGuess} />
 
