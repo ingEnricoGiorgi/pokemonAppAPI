@@ -1,11 +1,19 @@
 const API = 'https://pokeapi.co/api/v2';
-
+//All generation
+/*
 export async function fetchAllNames() {
   const r = await fetch(`${API}/pokemon?limit=100000&offset=0`);
   const data = await r.json();
-  // restituisco SOLO i nomi in minuscolo
   return data.results.map(x => x.name.toLowerCase());
 }
+  */
+//GENRAZIONE 1
+export async function fetchAllNames() {
+  const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=151'); // solo i primi 151
+  const data = await res.json();
+  return data.results.map(p => p.name);
+}
+
 
 export async function fetchPokemon(idOrName) {
   const r = await fetch(`${API}/pokemon/${idOrName}`);
